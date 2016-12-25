@@ -78,13 +78,13 @@ void list_vertices(vector_list_t& vert, double p, const Rcpp::NumericVector Pi)
 double dist2(const std::vector<double>& x, const std::vector<double>& y)
 {
 	double ss = 0;
-	int n = x.size();
+	unsigned int n = x.size();
 
 	if (n != y.size()) {
 		throw std::range_error("In dist2, vectors must have same length");
 	}
 
-	for (int i = 0; i < n; i++) {
+	for (unsigned int i = 0; i < n; i++) {
 		ss += pow(x[i] - y[i], 2.0);
 	}
 

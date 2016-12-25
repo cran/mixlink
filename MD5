@@ -1,4 +1,4 @@
-28b711ae4c74155df346e898f2deb92e *DESCRIPTION
+153877934c7ae796565d2c13fb430a38 *DESCRIPTION
 1766ab0c87c8cf08aa9dab0664c00417 *NAMESPACE
 04b5d4b76fede57d6a98b837fe602f35 *R/dirichlet.R
 0cab19e7bb409f5ee9416e0857aaafe8 *R/dist-binom.R
@@ -42,8 +42,8 @@ b710f3c6dbc2a2d6ca4f18a67c12f739 *src/Makevars.in
 b3c1c1a81f78a90380da8ca5a7cb5dd5 *src/MyRcppExports.cpp
 8de617a70e7c63deee5d22622e5f141c *src/density-binom.cpp
 85027ddef9633f7124a34b333fcc9d44 *src/density-pois.cpp
-9cfe537633dc829e5e13616d1d4f2657 *src/find-vertices.cpp
+65c36e933a90b5e38f96c3eadbabe955 *src/find-vertices.cpp
 fa592a3120e682a169928b750d08a7e8 *src/find-vertices.h
 8e16592821189147dbef31f4a5142988 *src/gibbs.cpp
 95caf26b1815997eab698ea6f766b153 *src/hyperg_1F1.cpp
-336492462af590e4a98c193c10e7034e *src/rwmetrop.cpp
+b37d014118b782a27b597164fb3fd2f8 *src/rwmetrop.cpp

@@ -33,7 +33,7 @@ Rcpp::List rwmetrop(const Rcpp::NumericVector& par_init, const Rcpp::Function& l
 	int qq = par_init.size();
 	int G = grp_idx_list.size();
 
-	int R_keep = ceil((R - burn) / thin);
+	int R_keep = (int) ceil(double(R - burn) / double(thin));
 	int idx_sample = 0;
 	Rcpp::NumericMatrix par_hist(R_keep, qq);
 	Rcpp::NumericVector b = par_init;
