@@ -38,13 +38,28 @@ my.numerical.format <- function(x, lower = 1e-4) {
 	return(y)
 }
 
+#' Multinomial logit transformation
+#'
+#' mlogit transforms from probability simplex S^J to R^(J-1)
+#' inv.mlogit transforms from R^(J-1) to probability simplex S^J
+#'
+#' @param x A (J-1)-dimensional numeric vector
+#' @param p A J-dimensional numeric vector in the probabiity simplex
+#'
+#' @return A numeric vector
+#'
+#' @examples
+#'   x <- c(1,1,1,1)
+#'   p <- inv.mlogit(x)
+#'   x2 <- mlogit(p)
+#' @name mlogit
 mlogit <- function(p) {
 	J <- length(p)
 	x <- log(p[-J] / p[J])
 	return(x)
 }
 
-# Transform from R^(J-1) to probability simplex S^J
+#' @name mlogit
 inv.mlogit <- function(x) {
 	z <- exp(x)
 	P.J <- 1 / (1 + sum(z))
@@ -59,7 +74,7 @@ hypergeomF1 <- function(x, a, b, log = FALSE) {
 	a <- rep_len(a, n)
 	b <- rep_len(b, n)
 	
-	ff <- .Call("hyperg_1F1", a, b, x)
+	ff <- hyperg_1F1(a, b, x)
 	if (log) log(ff)
 	else ff
 }

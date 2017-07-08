@@ -30,9 +30,11 @@ NULL
 rqres <- function(y, F, eps = 1e-6)
 {
 	n <- length(y)
-	FL <- F(y - eps)
-	FU <- F(y)
-	u <- runif(n, min = FL, max = FU)
+	FL <- pmin(pmax(F(y - eps), 0), 1)
+	FU <- pmax(pmin(F(y), 1), 0)
+	idx.neq <- which(FL < FU)
+	u <- FL
+	u[idx.neq] <- runif(length(idx.neq), min = FL, max = FU)
 	qres <- qnorm(u)
 	return(qres)
 }

@@ -2,9 +2,11 @@
 % Please edit documentation in R/dist-pois.R
 \name{Mixture Link Poisson Distribution}
 \alias{Mixture Link Poisson Distribution}
-\alias{d.mixlink.pois}
-\alias{p.mixlink.pois}
 \alias{r.mixlink.pois}
+\alias{Mixture Link Poisson Distribution}
+\alias{d.mixlink.pois}
+\alias{Mixture Link Poisson Distribution}
+\alias{p.mixlink.pois}
 \title{Distribution functions}
 \usage{
 r.mixlink.pois(n, mean, Pi, kappa, save.latent = FALSE)
@@ -51,4 +53,3 @@ Andrew M. Raim, Nagaraj K. Neerchal, and Jorge G. Morel.
             An Extension of Generalized Linear Models to Finite
             Mixture Outcomes. arXiv preprint: 1612.03302
 }
-

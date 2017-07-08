@@ -1,6 +1,7 @@
 #include <Rcpp.h>
 #include "find-vertices.h"
 
+// [[Rcpp::export]]
 Rcpp::NumericVector mixlink_gibbs_Q_binom(const Rcpp::IntegerVector& y,
 	const Rcpp::IntegerVector& m, const Rcpp::NumericVector& mean,
 	const Rcpp::NumericMatrix& psi, const Rcpp::NumericVector& Pi,
@@ -51,6 +52,7 @@ Rcpp::NumericVector mixlink_gibbs_Q_binom(const Rcpp::IntegerVector& y,
 	return ff;
 }
 
+// [[Rcpp::export]]
 Rcpp::NumericVector mixlink_gibbs_Q_pois(const Rcpp::IntegerVector& y,
 	const Rcpp::NumericVector& mean, const Rcpp::NumericMatrix& psi,
 	const Rcpp::NumericVector& Pi, const Rcpp::NumericVector& kappa)

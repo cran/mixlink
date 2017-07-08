@@ -138,6 +138,7 @@ Rcpp::NumericMatrix vector_list_to_matrix(const vector_list_t& vert_list,
 	return V;
 }
 
+// [[Rcpp::export]]
 Rcpp::NumericMatrix find_vertices_prob(double p, const Rcpp::NumericVector& Pi, double tol)
 {
 	int J = Pi.size();
@@ -160,6 +161,7 @@ Rcpp::NumericMatrix find_vertices_prob(double p, const Rcpp::NumericVector& Pi, 
 	return vector_list_to_matrix(unique_vert_list, J, k);
 }
 
+// [[Rcpp::export]]
 Rcpp::NumericMatrix find_vertices_nonneg(double p, const Rcpp::NumericVector& Pi)
 {
 	int J = Pi.size();

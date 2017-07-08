@@ -3,8 +3,11 @@
 \name{Numerical MLE}
 \alias{Numerical MLE}
 \alias{mle.mixlink.binom}
+\alias{Numerical MLE}
 \alias{mle.mixlink.binom.x}
+\alias{Numerical MLE}
 \alias{mle.mixlink.pois}
+\alias{Numerical MLE}
 \alias{mle.mixlink.pois.x}
 \title{Numerical MLE}
 \usage{
@@ -72,4 +75,3 @@ Andrew M. Raim, Nagaraj K. Neerchal, and Jorge G. Morel.
             An Extension of Generalized Linear Models to Finite
             Mixture Outcomes. arXiv preprint: 1612.03302
 }
-

@@ -15,4 +15,3 @@
 \description{
 See generic \code{print} function for usage.
 }
-

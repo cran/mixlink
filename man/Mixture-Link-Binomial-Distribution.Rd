@@ -2,9 +2,11 @@
 % Please edit documentation in R/dist-binom.R
 \name{Mixture Link Binomial Distribution}
 \alias{Mixture Link Binomial Distribution}
-\alias{d.mixlink.binom}
-\alias{p.mixlink.binom}
 \alias{r.mixlink.binom}
+\alias{Mixture Link Binomial Distribution}
+\alias{d.mixlink.binom}
+\alias{Mixture Link Binomial Distribution}
+\alias{p.mixlink.binom}
 \title{Distribution functions}
 \usage{
 r.mixlink.binom(n, mean, Pi, kappa, m, save.latent = FALSE)
@@ -53,4 +55,3 @@ Andrew M. Raim, Nagaraj K. Neerchal, and Jorge G. Morel.
             An Extension of Generalized Linear Models to Finite
             Mixture Outcomes. arXiv preprint: 1612.03302
 }
-

@@ -4,23 +4,21 @@ set.seed(1234)
 
 # ----- Prepare the data -----
 n <- 400
-m <- rep(20, n)
-x <- runif(n, -2, 2)
+x <- runif(n, 0, 4)
 X <- model.matrix(~ x)
 d <- ncol(X)
-Beta.true <- c(-1, 1)
-p.true <- pnorm(X %*% Beta.true)
-kappa.true <- 2
+Beta.true <- c(3, -0.05)
+mean.true <- exp(X %*% Beta.true)
+kappa.true <- 3
 Pi.true <- c(0.85, 0.15)
 J <- length(Pi.true)
 
-y <- r.mixlink.binom(n, p.true, Pi.true, kappa.true, m, save.latent = FALSE)
+y <- r.mixlink.pois(n, mean.true, Pi.true, kappa.true, save.latent = FALSE)
 
 # ----- MLE for initial values -----
-glm.out <- glm(cbind(y, m-y) ~ X-1, family = binomial(link = "probit"))
+glm.out <- glm(y ~ X-1, family = poisson)
 phi.init <- c(coef(glm.out), mlogit(normalize(1:J)), log(1))
-mle.out <- mle.mixlink.binom.x(y, m, X, J=J, invlink.mean = pnorm,
-  phi.init = phi.init)
+mle.out <- mle.mixlink.pois.x(y, X, J=J, invlink.mean = exp, phi.init = phi.init)
 print(mle.out)
 
 # ----- MCMC with Metropolis Hastings -----
@@ -35,10 +33,12 @@ proposal <- list(
 )
 
 param.grp <- seq(1, d+J-1+1)
-metrop.out <- rwmetrop.mixlink.binomial(y, X, m, R = 1000, burn = 0, thin = 1,
-	invlink = pnorm, Beta.init = mle.out$theta.hat$Beta,
-	Pi.init = mle.out$theta.hat$Pi, kappa.init = mle.out$theta.hat$kappa,
-	hyper = hyper, use.laplace.approx = FALSE, report.period = 50,
+metrop.out <- rwmetrop.mixlink.poisson(y, X, R = 1000, burn = 0, thin = 1,
+	invlink = exp, report.period = 50,
+  Beta.init = mle.out$theta.hat$Beta,
+	Pi.init = mle.out$theta.hat$Pi,
+  kappa.init = mle.out$theta.hat$kappa,
+	hyper = hyper, use.laplace.approx = FALSE,
 	proposal = proposal, param.grp = param.grp)
 print(metrop.out)
 

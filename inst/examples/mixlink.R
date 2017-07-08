@@ -13,6 +13,11 @@ coords <- barplot(prop, ylim = ylim, xlab = "x", ylab = "Density")
 points(coords, d.mixlink.binom(x, m, p, Pi, kappa), pch = 19)
 title("Histogram vs. Density")
 
+# Also check the CDF
+pempirical <- ecdf(y)
+plot(pempirical)
+lines(-10:m, p.mixlink.binom(-10:m, m, p, Pi, kappa), col = "green", lwd = 2)
+
 # ----- Compare histogram to density for MixLink Poisson -----
 n <- 100000; m <- 40
 x <- 0:m
@@ -24,3 +29,9 @@ ylim <- c(0, max(prop) * 1.05)
 coords <- barplot(prop, ylim = ylim, xlab = "x", ylab = "Density")
 points(coords, d.mixlink.pois(x, mean, Pi, kappa), pch = 19)
 title("Histogram vs. Density")
+
+# Also check the CDF
+pempirical <- ecdf(y)
+plot(pempirical)
+lines(-10:m, p.mixlink.pois(-10:m, mean, Pi, kappa), col = "green", lwd = 2)
+

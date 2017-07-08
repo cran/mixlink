@@ -69,18 +69,23 @@ find.vertices.nonneg <- function(mean, Pi)
 #' @name Mixture Link Poisson Distribution
 d.mixlink.pois <- function(y, mean, Pi, kappa, log = FALSE)
 {
+  if (any(mean < 0)) { stop("mean must be positive") }
+  if (any(kappa < 0)) { stop("kappa must be positive") }
+
 	s <- max(length(y), length(mean), length(kappa))
 	if (length(y) == 1) { y <- rep(y, s) }
 	if (length(kappa) == 1) { kappa <- rep(kappa, s) }
 	if (length(mean) == 1) { mean <- rep(mean, s) }
-	ff <- .Call("d_mixlink_pois", as.integer(y), mean, Pi, kappa)
+
+	ff <- d_mixlink_pois(as.integer(y), mean, Pi, kappa)
 	if (log) log(ff)
 	else ff
 }
 
 p.mixlink.pois.one <- function(y, mean, Pi, kappa)
 {
-	sum(d.mixlink.pois(0:y, mean, Pi, kappa))
+  s <- seq_int_ordered(0, y)
+	sum(d.mixlink.pois(s, mean, Pi, kappa))
 }
 
 #' @name Mixture Link Poisson Distribution

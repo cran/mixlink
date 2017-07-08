@@ -2,6 +2,7 @@
 #include <RcppGSL.h>
 #include <gsl/gsl_sf_hyperg.h>
 
+// [[Rcpp::export]]
 Rcpp::NumericVector hyperg_1F1(const Rcpp::NumericVector& a,
 	const Rcpp::NumericVector& b, const Rcpp::NumericVector& x)
 {

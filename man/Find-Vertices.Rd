@@ -2,8 +2,9 @@
 % Please edit documentation in R/dist-binom.R, R/dist-pois.R
 \name{Find Vertices}
 \alias{Find Vertices}
-\alias{find.vertices.nonneg}
 \alias{find.vertices.prob}
+\alias{Find Vertices}
+\alias{find.vertices.nonneg}
 \title{Compute vertices for Mixture Link}
 \usage{
 find.vertices.prob(mean, Pi, tol = 1e-08)
@@ -36,4 +37,3 @@ Andrew M. Raim, Nagaraj K. Neerchal, and Jorge G. Morel.
             An Extension of Generalized Linear Models to Finite
             Mixture Outcomes. arXiv preprint: 1612.03302
 }
-

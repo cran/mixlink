@@ -2,6 +2,7 @@
 #include <R_ext/Applic.h>
 #include <gsl/gsl_sf_hyperg.h>
 
+// [[Rcpp::export]]
 Rcpp::NumericVector d_mixlink_pois(const Rcpp::IntegerVector& y,
 	const Rcpp::NumericVector& mean, const Rcpp::NumericVector& Pi,
 	const Rcpp::NumericVector& kappa)

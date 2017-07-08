@@ -35,6 +35,7 @@ void integrand_binom(double *w, int n, void *ex)
 	}
 }
 
+// [[Rcpp::export]]
 Rcpp::NumericVector d_mixlink_binom(const Rcpp::IntegerVector& y,
 	const Rcpp::IntegerVector& m, const Rcpp::NumericVector& mean,
 	const Rcpp::NumericVector& Pi, const Rcpp::NumericVector& kappa,

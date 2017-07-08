@@ -1,8 +1,9 @@
 #' @name Metropolis-Hastings Sampler
-rwmetrop.mixlink.poisson <- function(y, X, R, burn = 0, thin = 1,
-	invlink = exp, Beta.init = NULL, Pi.init, kappa.init = NULL,
-	hyper = NULL, reporting.period = 1, use.laplace.approx = TRUE,
-	proposal = NULL, param.grp = NULL, fixed.kappa = FALSE)
+rwmetrop.mixlink.poisson <- function(y, X, offset = rep(0, length(y)),
+  R, burn = 0, thin = 1, invlink = exp, Beta.init = NULL, Pi.init,
+  kappa.init = NULL, hyper = NULL, report.period = R+1,
+  use.laplace.approx = TRUE, proposal = NULL, param.grp = NULL,
+  fixed.kappa = FALSE)
 {
 	st <- Sys.time()
 	d <- ncol(X)
@@ -55,6 +56,9 @@ rwmetrop.mixlink.poisson <- function(y, X, R, burn = 0, thin = 1,
 
 		p <- invlink(Data$X %*% Beta)
 		ll <- d.mixlink.pois(Data$y, p, Pi, kappa, log = TRUE)
+		if (any(is.na(ll)) || any(is.infinite(ll))) {
+		  browser()
+		}
 
 		sum(ll) + Beta.prior + Pi.prior + kappa.prior + l.Pi.tx + l.kappa.tx
 	}
@@ -75,7 +79,7 @@ rwmetrop.mixlink.poisson <- function(y, X, R, burn = 0, thin = 1,
 	# ----- Fit the model -----
 	logger("Starting MCMC\n")
 	metrop.out <- rwmetrop(start, logpost, Data, proposal, grp = param.grp,
-		R = R, burn = burn, thin = thin, report.period = reporting.period)
+		R = R, burn = burn, thin = thin, report.period = report.period)
 	logger("Finished MCMC\n")
 
 	elapsed.sec <- as.numeric(Sys.time() - st, unit = "secs")
@@ -92,7 +96,9 @@ rwmetrop.mixlink.poisson <- function(y, X, R, burn = 0, thin = 1,
 		Pi.hist = Pi.hist, kappa.hist = kappa.hist,
 		accept = metrop.out$accept, elapsed.sec = elapsed.sec,
 		laplace.out = laplace.out, R.keep = nrow(Beta.hist),
-		X.names = colnames(X))
+		X.names = colnames(X), y = y, X = X, offset = offset,
+	  invlink = invlink, report.period = report.period)
+
 	class(ret) <- "rwmetrop.mixlink.poisson"
 	return(ret)
 }
@@ -141,22 +147,29 @@ print.rwmetrop.mixlink.poisson <- function(x, ...)
 	printf("Accept%% {%s}\n", paste(round(x$accept * 100, 2), collapse = ", "))
 }
 
-#' @name DIC for Random-Walk Metropolis Hastings Sampler
-DIC.rwmetrop.mixlink.poisson <- function (metrop.out, y, X, offset = rep(0, length(y)), invlink = exp) 
+#' @name S3 methods for rwmetrop output objects
+DIC.rwmetrop.mixlink.poisson <- function (object, ...)
 {
-	R.keep <- metrop.out$R.keep
+  y <- object$y
+  X <- object$X
+  offset <- object$offset
+
+	R.keep <- object$R.keep
 	D <- numeric(R.keep)
 	for (r in 1:R.keep) {
-		Beta <- metrop.out$Beta.hist[r, ]
-		Pi <- metrop.out$Pi.hist[r, ]
-		kappa <- metrop.out$kappa.hist[r]
-		mean.hat <- invlink(X %*% Beta + offset)
+    if (r %% object$report.period == 0) {
+      logger("Computing DIC for rep %d\n", r)
+    }
+		Beta <- object$Beta.hist[r, ]
+		Pi <- object$Pi.hist[r, ]
+		kappa <- object$kappa.hist[r]
+		mean.hat <- object$invlink(X %*% Beta + offset)
 		D[r] <- -2 * sum(d.mixlink.pois(y, mean.hat, Pi, kappa, log = TRUE))
 	}
-	Beta.bar <- colMeans(metrop.out$Beta.hist)
-	Pi.bar <- colMeans(metrop.out$Pi.hist)
-	kappa.bar <- mean(metrop.out$kappa.hist)
-	mean.bar <- invlink(X %*% Beta.bar + offset)
+	Beta.bar <- colMeans(object$Beta.hist)
+	Pi.bar <- colMeans(object$Pi.hist)
+	kappa.bar <- mean(object$kappa.hist)
+	mean.bar <- object$invlink(X %*% Beta.bar + offset)
 	D.hat <- -2 * sum(d.mixlink.pois(y, mean.bar, Pi.bar, kappa.bar, log = TRUE))
 	D.bar <- mean(D)
 	p.D <- D.bar - D.hat
@@ -164,3 +177,26 @@ DIC.rwmetrop.mixlink.poisson <- function (metrop.out, y, X, offset = rep(0, leng
 	return(dic)
 }
 
+#' @name S3 methods for rwmetrop output objects
+residuals.rwmetrop.mixlink.poisson <- function(object, ...)
+{
+  y <- object$y
+  X <- object$X
+  offset <- object$offset
+  n <- nrow(X)
+  R.keep <- object$R.keep
+
+  rqres.pp <- matrix(NA, R.keep, n)
+  for (r in 1:R.keep) {
+    if (r %% object$report.period == 0) {
+      logger("Computing residuals for rep %d\n", r)
+    }
+  	Beta <- object$Beta.hist[r,]
+  	Pi <- object$Pi.hist[r,]
+  	kappa <- object$kappa.hist[r]
+  	mean.hat <- object$invlink(X %*% Beta + offset)
+  	rqres.pp[r,] <- rqres.mixlink.pois(y, mean.hat, Pi, kappa)
+  }
+
+  return(rqres.pp)
+}

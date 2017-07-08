@@ -6,8 +6,11 @@ rwmetrop <- function(par.init, logpost, Data, proposal, R,
 	qq <- length(par.init)
 	V.proposal.half.trans <- t(proposal$scale * chol(proposal$var))
 	logf <- function(par) { logpost(par, Data) }
+	if (is.infinite(logf(par.init)) | is.na(logf(par.init))) {
+	  stop("logpost(par.init) must be a finite value")
+	}
 	grp.idx.list <- split(1:qq - 1, grp)
-	ret <- .Call("rwmetrop", par.init, logf, V.proposal.half.trans,
+	ret <- rwmetrop_cpp(par.init, logf, V.proposal.half.trans,
 		grp.idx.list, R, burn, thin, report.period)
 	return(ret)
 }

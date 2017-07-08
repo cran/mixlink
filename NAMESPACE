@@ -1,4 +1,4 @@
-useDynLib(mixlink)
+useDynLib(mixlink, .registration = TRUE)
 
 # Export functions
 export(r.mixlink.binom)
@@ -15,32 +15,38 @@ export(mle.mixlink.binom)
 export(mle.mixlink.binom.x)
 export(mle.mixlink.pois)
 export(mle.mixlink.pois.x)
-export(gibbs.mixlink.reg)
+export(gibbs.mixlink)
 export(rwmetrop.mixlink.binomial)
 export(rwmetrop.mixlink.poisson)
 export(normalize)
-export(DIC.gibbs.mixlink.reg)
-export(DIC.rwmetrop.mixlink.binomial)
-export(DIC.rwmetrop.mixlink.poisson)
+export(mlogit)
+export(inv.mlogit)
+export(DIC)
 
 S3method(AIC, mle.fit)
 S3method(BIC, mle.fit)
+S3method(DIC, gibbs.mixlink)
+S3method(DIC, rwmetrop.mixlink.binomial)
+S3method(DIC, rwmetrop.mixlink.poisson)
 S3method(coef, mle.fit)
 S3method(confint, mle.fit)
-S3method(summary, gibbs.mixlink.reg)
+S3method(summary, gibbs.mixlink)
 S3method(summary, rwmetrop.mixlink.binomial)
 S3method(summary, rwmetrop.mixlink.poisson)
-S3method(print, gibbs.mixlink.reg)
+S3method(print, gibbs.mixlink)
 S3method(print, rwmetrop.mixlink.binomial)
 S3method(print, rwmetrop.mixlink.poisson)
 S3method(print, mle.fit.ci)
 S3method(print, mle.fit)
+S3method(residuals, gibbs.mixlink)
+S3method(residuals, rwmetrop.mixlink.binomial)
+S3method(residuals, rwmetrop.mixlink.poisson)
 S3method(summary, mle.fit)
 S3method(logLik, mle.fit)
 S3method(vcov, mle.fit)
 
 # Import all packages listed as Imports or Depends
 import(
-  RcppGSL, mvtnorm, numDeriv, stats
+	mvtnorm, numDeriv, stats, Rcpp
 )
 

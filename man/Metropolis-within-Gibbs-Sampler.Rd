@@ -2,11 +2,11 @@
 % Please edit documentation in R/gibbs-binom-pois.R
 \name{Metropolis-within-Gibbs Sampler}
 \alias{Metropolis-within-Gibbs Sampler}
-\alias{gibbs.mixlink.reg}
+\alias{gibbs.mixlink}
 \title{Metropolis-within-Gibbs Sampler}
 \usage{
-gibbs.mixlink.reg(y, X, R, burn = 0, thin = 1, invlink = NULL,
-  report.period = 100, save.psi = FALSE, Beta.init = NULL, Pi.init,
+gibbs.mixlink(y, X, R, burn = 0, thin = 1, invlink = NULL,
+  report.period = R + 1, save.psi = FALSE, Beta.init = NULL, Pi.init,
   kappa.init = NULL, psi.init = NULL, proposal.VBeta = NULL,
   proposal.VPi = NULL, proposal.Vkappa = NULL, proposal.Vpsi = NULL,
   hyper = NULL, trials = NULL, offset = rep(0, length(y)),
@@ -114,15 +114,14 @@ y <- r.mixlink.binom(n, mean.true, Pi.true, kappa.true, m)
 # ----- Run Metropolis-within-Gibbs sampler -----
 hyper <- list(VBeta = diag(1000, d), alpha.Pi = rep(1, J),
 	kappa.a = 1, kappa.b = 1/2)
-gibbs.out <- gibbs.mixlink.reg(y, X, R = 10, burn = 5, thin = 1,
+gibbs.out <- gibbs.mixlink(y, X, R = 10, burn = 5, thin = 1,
 	invlink = plogis, report.period = 100, Pi.init = c(1,9)/10,
 	proposal.VBeta = solve(t(X) \%*\% X), proposal.VPi = diag(0.25^2, J-1),
 	proposal.Vkappa = 0.5^2, proposal.Vpsi = diag(0.5^2, J),
 	hyper = hyper, family = "binomial", trials = m)
 
 print(gibbs.out)
-DIC.gibbs.mixlink.reg(gibbs.out, y, X, trials = m, invlink = plogis,
-	family = "binomial")
+DIC(gibbs.out)
 
 }
 \references{
@@ -130,4 +129,3 @@ Andrew M. Raim, Nagaraj K. Neerchal, and Jorge G. Morel.
             An Extension of Generalized Linear Models to Finite
             Mixture Outcomes. arXiv preprint: 1612.03302
 }
-

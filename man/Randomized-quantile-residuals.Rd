@@ -2,7 +2,9 @@
 % Please edit documentation in R/rqres.R
 \name{Randomized quantile residuals}
 \alias{Randomized quantile residuals}
+\alias{Randomized quantile residuals}
 \alias{rqres.mixlink.binom}
+\alias{Randomized quantile residuals}
 \alias{rqres.mixlink.pois}
 \title{Randomized quantile residuals for Mixture Link}
 \usage{
@@ -43,4 +45,3 @@ Peter K. Dunn and Gordon K. Smyth. Randomized quantile
             residuals. Journal of Computational and Graphical Statistics,
             5(3):236-244, 1996.
 }
-

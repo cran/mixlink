@@ -19,4 +19,3 @@ Scale a numeric vector by the sum of its elements
   x <- c(1,1,1,1)
   normalize(x)
 }
-

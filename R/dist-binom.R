@@ -93,13 +93,17 @@ r.mixlink.binom <- function(n, mean, Pi, kappa, m, save.latent = FALSE)
 #'
 find.vertices.prob <- function(mean, Pi, tol = 1e-8)
 {
-	vert <- .Call("find_vertices_prob", mean, Pi, tol)
+	vert <- find_vertices_prob(mean, Pi, tol)
 	return(vert)
 }
 
 #' @name Mixture Link Binomial Distribution
 d.mixlink.binom <- function(y, m, mean, Pi, kappa, log = FALSE)
 {
+  if (any(mean < 0 | mean > 1)) { stop("mean must be between 0 and 1") }
+  if (any(kappa < 0)) { stop("kappa must be positive") }
+  if (any(m < 1)) { stop("m must be at least 1") }
+
 	s <- max(length(y), length(m), length(mean), length(kappa))
 	if (length(y) == 1) { y <- rep(y, s) }
 	if (length(m) == 1) { m <- rep(m, s) }
@@ -111,7 +115,7 @@ d.mixlink.binom <- function(y, m, mean, Pi, kappa, log = FALSE)
 	rel.tol <- .Machine$double.eps^.25
 	abs.tol <- rel.tol
 
-	ff <- .Call("d_mixlink_binom", as.integer(y), as.integer(m), mean, Pi,
+	ff <- d_mixlink_binom(as.integer(y), as.integer(m), mean, Pi,
 		kappa, subdiv, rel.tol, abs.tol)
 	if (log) log(ff)
 	else ff
@@ -119,7 +123,8 @@ d.mixlink.binom <- function(y, m, mean, Pi, kappa, log = FALSE)
 
 p.mixlink.binom.one <- function(y, m, mean, Pi, kappa)
 {
-	sum(d.mixlink.binom(0:y, m, mean, Pi, kappa))
+  s <- seq_int_ordered(0, y)
+	sum(d.mixlink.binom(s, m, mean, Pi, kappa))
 }
 
 #' @name Mixture Link Binomial Distribution

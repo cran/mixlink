@@ -82,18 +82,17 @@
 #' # ----- Run Metropolis-within-Gibbs sampler -----
 #' hyper <- list(VBeta = diag(1000, d), alpha.Pi = rep(1, J),
 #' 	kappa.a = 1, kappa.b = 1/2)
-#' gibbs.out <- gibbs.mixlink.reg(y, X, R = 10, burn = 5, thin = 1,
+#' gibbs.out <- gibbs.mixlink(y, X, R = 10, burn = 5, thin = 1,
 #' 	invlink = plogis, report.period = 100, Pi.init = c(1,9)/10,
 #' 	proposal.VBeta = solve(t(X) %*% X), proposal.VPi = diag(0.25^2, J-1),
 #' 	proposal.Vkappa = 0.5^2, proposal.Vpsi = diag(0.5^2, J),
 #' 	hyper = hyper, family = "binomial", trials = m)
 #' 
 #' print(gibbs.out)
-#' DIC.gibbs.mixlink.reg(gibbs.out, y, X, trials = m, invlink = plogis,
-#' 	family = "binomial")
+#' DIC(gibbs.out)
 #' 
-gibbs.mixlink.reg <- function(y, X, R, burn = 0, thin = 1,
-	invlink = NULL, report.period = 100, save.psi = FALSE,
+gibbs.mixlink <- function(y, X, R, burn = 0, thin = 1,
+	invlink = NULL, report.period = R+1, save.psi = FALSE,
 	Beta.init = NULL, Pi.init, kappa.init = NULL, psi.init = NULL,
 	proposal.VBeta = NULL, proposal.VPi = NULL, proposal.Vkappa = NULL,
 	proposal.Vpsi = NULL, hyper = NULL, trials = NULL, offset = rep(0, length(y)),
@@ -294,13 +293,15 @@ gibbs.mixlink.reg <- function(y, X, R, burn = 0, thin = 1,
 		elapsed.sec = elapsed.sec, accept.Beta = accept.Beta,
 		accept.Pi = accept.Pi, accept.kappa = accept.kappa,
 		accept.psi = accept.psi, R = R, R.keep = R.keep,
-		family = family)
-	class(ret) <- "gibbs.mixlink.reg"
+		family = family, report.period = report.period,
+	  y = y, X = X, trials = trials, offset = offset,
+	  invlink = invlink)
+	class(ret) <- "gibbs.mixlink"
 	return(ret)
 }
 
-#' @name S3 methods for gibbs.mixlink.reg output objects
-summary.gibbs.mixlink.reg <- function(object, ...)
+#' @name S3 methods for gibbs.mixlink output objects
+summary.gibbs.mixlink <- function(object, ...)
 {
 	summary.Beta <- data.frame(
 		mean = colMeans(object$Beta.hist),
@@ -334,10 +335,10 @@ summary.gibbs.mixlink.reg <- function(object, ...)
 	return(summary.theta)
 }
 
-#' @name S3 methods for gibbs.mixlink.reg output objects
-print.gibbs.mixlink.reg <- function(x, ...)
+#' @name S3 methods for gibbs.mixlink output objects
+print.gibbs.mixlink <- function(x, ...)
 {
-	s <- summary.gibbs.mixlink.reg(x)
+	s <- summary.gibbs.mixlink(x)
 	print(s)
 	printf("Family: %s\n", x$family)
 	printf("Elapsed sec: %0.2f\n", x$elapsed.sec)
@@ -347,35 +348,27 @@ print.gibbs.mixlink.reg <- function(x, ...)
 		max(x$accept.psi) / x$R * 100)
 }
 
-#' DIC for Metropolis-within-Gibbs
-#'
-#' Deviance Information Criteria (DIC) computed on results from
-#' Metropolis-within-Gibbs sampler.
-#'
-#' @param gibbs.out Results from Metropolis-within-Gibbs sampler.
-#' @param y Observations.
-#' @param X Design matrix for regression.
-#' @param trials Number of success/failure trials.
-#' @param offset Offset term to add to regression function, as commonly used in count
-#'        models.
-#' @param invlink The inverse link function for the mean. Default is \code{NULL},
-#'        which indicates to use \code{plogis} for Binomial and \code{exp} for Poisson.
-#' @param family Can be either \code{binomial} or \code{poisson}.
-#'
-#' @return DIC
-#' @name DIC for Metropolis-within-Gibbs Sampler
-DIC.gibbs.mixlink.reg <- function(gibbs.out, y, X, trials = NULL, offset = NULL,
-	invlink = NULL, family = NULL)
+#' @name S3 methods for gibbs.mixlink output objects
+DIC.gibbs.mixlink <- function(object, ...)
 {
-	m <- trials
-	R.keep <- gibbs.out$R.keep
+  y <- object$y
+  X <- object$X
+  m <- object$trials
+  offset <- object$offset
+  invlink <- object$invlink
+  family <- object$family
+
+	R.keep <- object$R.keep
 	D <- numeric(R.keep)
 
 	for (r in 1:R.keep) {
-		Beta <- gibbs.out$Beta.hist[r,]
-		Pi <- gibbs.out$Pi.hist[r,]
-		kappa <- gibbs.out$kappa.hist[r]
-		mean.hat <-  invlink(X %*% Beta)
+	  if (r %% object$report.period == 0) {
+      logger("Computing DIC for rep %d\n", r)
+    }
+		Beta <- object$Beta.hist[r,]
+		Pi <- object$Pi.hist[r,]
+		kappa <- object$kappa.hist[r]
+		mean.hat <-  invlink(X %*% Beta + offset)
 
 		if (family == "binomial") {
 			D[r] <- -2 * sum(d.mixlink.binom(y, m, mean.hat, Pi, kappa, log = TRUE))
@@ -386,10 +379,10 @@ DIC.gibbs.mixlink.reg <- function(gibbs.out, y, X, trials = NULL, offset = NULL,
 		}
 	}
 
-	Beta.bar <- colMeans(gibbs.out$Beta.hist)
-	Pi.bar <- colMeans(gibbs.out$Pi.hist)
-	kappa.bar <- mean(gibbs.out$kappa.hist)
-	mean.bar <- invlink(X %*% Beta.bar)
+	Beta.bar <- colMeans(object$Beta.hist)
+	Pi.bar <- colMeans(object$Pi.hist)
+	kappa.bar <- mean(object$kappa.hist)
+	mean.bar <- invlink(X %*% Beta.bar + offset)
 	
 	if (family == "binomial") {
 		D.hat <- -2 * sum(d.mixlink.binom(y, m, mean.bar, Pi.bar, kappa.bar, log = TRUE))
@@ -406,12 +399,45 @@ DIC.gibbs.mixlink.reg <- function(gibbs.out, y, X, trials = NULL, offset = NULL,
 	return(dic)
 }
 
+#' @name S3 methods for gibbs.mixlink output objects
+residuals.gibbs.mixlink <- function(object, ...)
+{
+  y <- object$y
+  X <- object$X
+  m <- object$trials
+  offset <- object$offset
+  n <- nrow(X)
+  R.keep <- object$R.keep
+  family <- object$family
+
+  rqres.pp <- matrix(NA, R.keep, n)
+  for (r in 1:R.keep) {
+    if (r %% object$report.period == 0) {
+      logger("Computing residuals for rep %d\n", r)
+    }
+  	Beta <- object$Beta.hist[r,]
+  	Pi <- object$Pi.hist[r,]
+  	kappa <- object$kappa.hist[r]
+  	mean.hat <- object$invlink(X %*% Beta + offset)
+
+  	if (family == "binomial") {
+      rqres.pp[r,] <- rqres.mixlink.binom(y, m, mean.hat, Pi, kappa)
+    } else if (family == "poisson") {
+    	rqres.pp[r,] <- rqres.mixlink.pois(y, mean.hat, Pi, kappa)
+    } else {
+      stop("family must be binomial or poisson")
+    }
+  }
+
+  return(rqres.pp)
+}
+
 Q.binomial <- function(y, m, psi, mean, Pi, kappa, find_vert_tol = 1e-08)
 {
 	n <- length(y)
 	if (length(mean) == 1) { mean <- rep(mean, n) }
 	if (length(kappa) == 1) { kappa <- rep(kappa, n) }
-	res <- .Call("mixlink_gibbs_Q_binom", as.integer(y), as.integer(m), mean,
+	res <- mixlink_gibbs_Q_binom(as.integer(y), as.integer(m), mean,
 		psi, Pi, kappa, find_vert_tol)
 	return(res)
 }
@@ -421,7 +447,7 @@ Q.poisson <- function(y, m, psi, mean, Pi, kappa, find_vert_tol = 1e-08)
 	n <- length(y)
 	if (length(mean) == 1) { mean <- rep(mean, n) }
 	if (length(kappa) == 1) { kappa <- rep(kappa, n) }
-	res <- .Call("mixlink_gibbs_Q_pois", as.integer(y), mean, psi, Pi, kappa)
+	res <- mixlink_gibbs_Q_pois(as.integer(y), mean, psi, Pi, kappa)
 	return(res)
 }
 

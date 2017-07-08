@@ -25,6 +25,7 @@ print(mle.out)
 mean.hat <- exp(X %*% mle.out$theta.hat$Beta)
 Pi.hat <- mle.out$theta.hat$Pi
 kappa.hat <- mle.out$theta.hat$kappa
+
 res <- rqres.mixlink.pois(y, mean.hat, Pi.hat, kappa.hat)
 qqnorm(res); qqline(res)
 plot(mean.hat, res)

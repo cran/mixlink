@@ -191,4 +191,3 @@ vcov.mle.fit <- function(object, ...)
 {
 	object$vcov
 }
-

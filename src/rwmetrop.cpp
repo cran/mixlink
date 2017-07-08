@@ -25,7 +25,8 @@ Rcpp::NumericVector matvecprod(const Rcpp::NumericMatrix& A,
 	return y;
 }
 
-Rcpp::List rwmetrop(const Rcpp::NumericVector& par_init, const Rcpp::Function& logf,
+// [[Rcpp::export]]
+Rcpp::List rwmetrop_cpp(const Rcpp::NumericVector& par_init, const Rcpp::Function& logf,
 	const Rcpp::NumericMatrix& pr_var_half_trans, const Rcpp::List& grp_idx_list,
 	int R, int burn, int thin, int report_period)
 {
@@ -67,6 +68,8 @@ Rcpp::List rwmetrop(const Rcpp::NumericVector& par_init, const Rcpp::Function& l
 			} else {
 				// Rcpp::warning("log_alpha was not finite");
 				Rprintf("WARNING: log_alpha was not finite\n");
+			  Rprintf("logf(b_) = %f\n", Rcpp::as<double>(logf(b_)));
+			  Rprintf("logfb = %f\n", logfb);
 			}
 		}
 
@@ -91,25 +94,5 @@ Rcpp::List rwmetrop(const Rcpp::NumericVector& par_init, const Rcpp::Function& l
 		Rcpp::Named("par", par_hist),
 		Rcpp::Named("accept", accept_grp / R)
 	);
-}
-
-RcppExport SEXP rwmetrop(SEXP sexp_par_init, SEXP sexp_logf,
-	SEXP sexp_pr_var_half_trans, SEXP sexp_grp_idx_list, SEXP sexp_R,
-	SEXP sexp_burn, SEXP sexp_thin, SEXP sexp_report_period)
-{
-BEGIN_RCPP
-	Rcpp::RObject __result;
-	Rcpp::RNGScope __rngScope;
-	Rcpp::traits::input_parameter<const Rcpp::NumericVector&>::type par_init(sexp_par_init);
-	Rcpp::traits::input_parameter<const Rcpp::Function&>::type logf(sexp_logf);
-	Rcpp::traits::input_parameter<const Rcpp::NumericMatrix&>::type pr_var_half_trans(sexp_pr_var_half_trans);
-	Rcpp::traits::input_parameter<const Rcpp::List&>::type grp_idx_list(sexp_grp_idx_list);
-	Rcpp::traits::input_parameter<int>::type R(sexp_R);
-	Rcpp::traits::input_parameter<int>::type burn(sexp_burn);
-	Rcpp::traits::input_parameter<int>::type thin(sexp_thin);
-	Rcpp::traits::input_parameter<int>::type report_period(sexp_report_period);
-	__result = Rcpp::wrap(rwmetrop(par_init, logf, pr_var_half_trans, grp_idx_list, R, burn, thin, report_period));
-	return __result;
-END_RCPP
 }
 

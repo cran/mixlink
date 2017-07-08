@@ -20,7 +20,7 @@ res <- r.mixlink.binom(n, mean.true, Pi.true, kappa.true, m, save.latent = TRUE)
 y <- res$y
 z <- res$z
 
-options(OMIR.optim.method = "BFGS", OMIR.optim.control = list())
+options(optim.method = "BFGS", optim.control = list())
 mle.out <- mle.mixlink.binom.x(y, m, X, J)
 print(mle.out)
 
